@@ -11,6 +11,18 @@ services:
       - .:/user/src/app
     environment:
       - MONGODB_URI=mongodb://mongo:27017/wiser
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: development
+    command: pnpm run start:dev auth
+    ports:
+      - '3001:3001'
+    volumes:
+      - .:/user/src/app
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/wiser
   mongo:
     image: mongo
     ports:
