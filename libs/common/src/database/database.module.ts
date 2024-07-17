@@ -5,9 +5,6 @@ import { ModelDefinition, MongooseModule } from "@nestjs/mongoose";
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({

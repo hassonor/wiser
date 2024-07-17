@@ -9,8 +9,8 @@ services:
       - '3000:3000'
     volumes:
       - .:/user/src/app
-    environment:
-      - MONGODB_URI=mongodb://mongo:27017/wiser
+    env_file:
+      - ./apps/reservations/.env
   auth:
     build:
       context: .
@@ -21,8 +21,8 @@ services:
       - '3001:3001'
     volumes:
       - .:/user/src/app
-    environment:
-      - MONGODB_URI=mongodb://mongo:27017/wiser
+    env_file:
+      - ./apps/auth/.env
   mongo:
     image: mongo
     ports:
