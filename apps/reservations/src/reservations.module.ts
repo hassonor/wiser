@@ -9,9 +9,6 @@ import { ReservationDocument, ReservationSchema } from "./reservations/models/re
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
     DatabaseModule,
     DatabaseModule.forFeature([{name: ReservationDocument.name, schema: ReservationSchema}]),
     LoggerModule

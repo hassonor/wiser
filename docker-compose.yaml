@@ -1,0 +1,17 @@
+services:
+  reservations:
+    build:
+      context: .
+      dockerfile: ./apps/reservations/Dockerfile
+      target: development
+    command: pnpm run start:dev reservations
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/user/src/app
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/wiser
+  mongo:
+    image: mongo
+    ports:
+      - '27017:27017'
