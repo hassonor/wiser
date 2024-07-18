@@ -1,6 +1,7 @@
-import { Prop } from "@nestjs/mongoose";
-import { IsDate, IsNotEmpty, IsString } from "class-validator";
+import { IsDate, IsNotEmpty, IsString, IsDefined, IsNotEmptyObject, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
+import { CreateChargeDto } from "@app/common";
+
 
 export class CreateReservationDto {
   @IsDate()
@@ -18,4 +19,10 @@ export class CreateReservationDto {
   @IsString()
   @IsNotEmpty()
   invoiceId: string;
+
+  @IsDefined()
+  @IsNotEmptyObject()
+  @ValidateNested()
+  @Type(() => CreateChargeDto)
+  charge: CreateChargeDto;
 }
