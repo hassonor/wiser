@@ -28,7 +28,10 @@ export class PaymentsService {
       currency: "usd",
       payment_method: "pm_card_visa"
     });
-    this.notificationsService.emit("notify_email", { email });
+    this.notificationsService.emit("notify_email", {
+      email,
+      text: `Your payment of $${amount} has completed successfully.`
+    });
     return paymentIntent;
   }
 
