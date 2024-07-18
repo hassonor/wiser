@@ -23,6 +23,18 @@ services:
       - .:/user/src/app
     env_file:
       - ./apps/auth/.env
+  payments:
+    build:
+      context: .
+      dockerfile: ./apps/payments/Dockerfile
+      target: development
+    command: pnpm run start:dev payments
+    ports:
+      - '3004:3004'
+    volumes:
+      - .:/user/src/app
+    env_file:
+      - ./apps/payments/.env
   mongo:
     image: mongo
     ports:
