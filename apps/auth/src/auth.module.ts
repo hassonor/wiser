@@ -7,9 +7,12 @@ import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import * as Joi from "joi";
 import { LocalStrategy } from "./strategies/local.strategy";
+import { JwtStrategy } from "./strategies/jwt.strategy";
 
 @Module({
-  imports: [UsersModule, LoggerModule,
+  imports: [
+    UsersModule,
+    LoggerModule,
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
@@ -20,18 +23,17 @@ import { LocalStrategy } from "./strategies/local.strategy";
       })
     }),
     JwtModule.registerAsync({
-      imports: undefined,
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get("JWT_SECRET"),
+        secret: configService.get<string>("JWT_SECRET"),
         signOptions: {
-          expiresIn: `${configService.get(`JWT_EXPIRATION`)}s`
+          expiresIn: `${configService.get("JWT_EXPIRATION")}s`
         }
       }),
       inject: [ConfigService]
     })
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy]
+  providers: [AuthService, LocalStrategy, JwtStrategy]
 })
 export class AuthModule {
 }
