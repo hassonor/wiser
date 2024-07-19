@@ -18,3 +18,9 @@ spec:
       containers:
         - name: payments
           image: me-west1-docker.pkg.dev/elaborate-night-429819-i9/payments/production
+          env:
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb
+                  key: connectionString

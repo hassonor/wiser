@@ -18,3 +18,9 @@ spec:
       containers:
         - name: notifications
           image: me-west1-docker.pkg.dev/elaborate-night-429819-i9/notifications/production
+          env:
+            - name: MONGODB_URI
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb
+                  key: connectionString
