@@ -1,0 +1,20 @@
+# encoding: utf-8
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth
+  labels:
+    app: auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - name: auth
+          image: me-west1-docker.pkg.dev/elaborate-night-429819-i9/auth/production
