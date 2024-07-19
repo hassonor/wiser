@@ -56,6 +56,3 @@ steps:
       ]
   - name: 'gcr.io/cloud-builders/docker'
     args: [ 'push', 'me-west1-docker.pkg.dev/elaborate-night-429819-i9/payments/production' ]
-
-options:
-  logging: CLOUD_LOGGING_ONLY
