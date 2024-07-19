@@ -19,8 +19,21 @@ spec:
         - name: notifications
           image: me-west1-docker.pkg.dev/elaborate-night-429819-i9/notifications/production
           env:
-            - name: MONGODB_URI
+            - name: PORT
+              value: '3000'
+            - name: GOOGLE_OAUTH_CLIENT_ID
+              value: 665083032562-k2ieabtct0vpddlig80arcsf98u7hcg6.apps.googleusercontent.com
+            - name: SMTP_USER
+              value: orh.dev1@gmail.com
+            - name: GOOGLE_OAUTH_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: mongodb
-                  key: connectionString
+                  name: google
+                  key: clientSecret
+            - name: GOOGLE_OAUTH_REFRESH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: google
+                  key: refreshToken
+          ports:
+            - containerPort: 3000
