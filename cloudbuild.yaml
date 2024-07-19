@@ -58,4 +58,4 @@ steps:
     args: [ 'push', 'me-west1-docker.pkg.dev/elaborate-night-429819-i9/payments/production' ]
 
 options:
-  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
+  logging: CLOUD_LOGGING_ONLY
