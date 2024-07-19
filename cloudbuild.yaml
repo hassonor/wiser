@@ -1,0 +1,58 @@
+steps:
+  # Reservations
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'build',
+        '-t',
+        'me-west1-docker.pkg.dev/elaborate-night-429819-i9/reservations/production',
+        '-f',
+        'apps/reservations/Dockerfile',
+        '.',
+      ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [ 'push', 'me-west1-docker.pkg.dev/elaborate-night-429819-i9/reservations/production' ]
+
+  # Auth
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'build',
+        '-t',
+        'me-west1-docker.pkg.dev/elaborate-night-429819-i9/auth/production',
+        '-f',
+        'apps/auth/Dockerfile',
+        '.',
+      ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'push', 'me-west1-docker.pkg.dev/elaborate-night-429819-i9/auth/production' ]
+
+  # Notifications
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'build',
+        '-t',
+        'me-west1-docker.pkg.dev/elaborate-night-429819-i9/notifications/production',
+        '-f',
+        'apps/notifications/Dockerfile',
+        '.',
+      ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [ 'push', 'me-west1-docker.pkg.dev/elaborate-night-429819-i9/notifications/production' ]
+
+  # Payments
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      [
+        'build',
+        '-t',
+        'me-west1-docker.pkg.dev/elaborate-night-429819-i9/payments/production',
+        '-f',
+        'apps/payments/Dockerfile',
+        '.',
+      ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'push', 'me-west1-docker.pkg.dev/elaborate-night-429819-i9/payments/production' ]
