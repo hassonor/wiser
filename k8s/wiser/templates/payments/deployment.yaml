@@ -19,8 +19,16 @@ spec:
         - name: payments
           image: me-west1-docker.pkg.dev/elaborate-night-429819-i9/payments/production
           env:
-            - name: MONGODB_URI
+            - name: PORT
+              value: "3001"
+            - name: NOTIFICATIONS_HOST
+              value: notifications
+            - name: NOTIFICATIONS_PORT
+              value: "3000"
+            - name: STRIPE_SECRET_KEY
               valueFrom:
                 secretKeyRef:
-                  name: mongodb
-                  key: connectionString
+                  name: stripe
+                  key: apiKey
+          ports:
+            - containerPort: 3001
