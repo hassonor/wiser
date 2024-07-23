@@ -3,7 +3,7 @@ describe("Reservations", () => {
 
   beforeAll(async () => {
     const user = {
-      email: "sleeprnestapp@gmail.com",
+      email: "hassonor@gmail.com",
       password: "StrogPassword123!@"
     };
     await fetch("http://auth:3001/users", {
