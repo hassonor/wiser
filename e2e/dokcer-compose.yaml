@@ -1,0 +1,40 @@
+services:
+  e2e:
+    build:
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./specs:/user/src/app/specs
+    depends_on:
+      - reservations
+      - auth
+      - payments
+      - notifications
+      - mongo
+  reservations:
+    image: me-west1-docker.pkg.dev/elaborate-night-429819-i9/reservations/production
+    ports:
+      - '3000:3000'
+    env_file:
+      - ../apps/reservations/.env
+  auth:
+    image: me-west1-docker.pkg.dev/elaborate-night-429819-i9/auth/production
+    ports:
+      - '3001:3001'
+    env_file:
+      - ../apps/auth/.env
+  payments:
+    image: me-west1-docker.pkg.dev/elaborate-night-429819-i9/payments/production
+    ports:
+      - '3003:3003'
+    env_file:
+      - ../apps/payments/.env
+  notifications:
+    image: me-west1-docker.pkg.dev/elaborate-night-429819-i9/notifications/production
+    ports:
+      - '3004:3004'
+    env_file:
+      - ../apps/notifications/.env
+  mongo:
+    image: mongo
+    ports:
+      - '27017:27017'
