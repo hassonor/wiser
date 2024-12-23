@@ -10,9 +10,9 @@
   "author": "Or Hasson",
   "license": "MIT",
   "dependencies": {
-    "nodemailer": "^6.9.14"
+    "nodemailer": "^6.9.16"
   },
   "devDependencies": {
-    "@types/nodemailer": "^6.4.15"
+    "@types/nodemailer": "^6.4.17"
   }
 }

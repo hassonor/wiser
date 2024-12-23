@@ -10,6 +10,6 @@
   "author": "Or Hasson",
   "license": "MIT",
   "dependencies": {
-    "stripe": "^16.2.0"
+    "stripe": "^16.12.0"
   }
 }
