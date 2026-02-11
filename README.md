@@ -1,203 +1,610 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
- </p>
+# 🏨 Wiser - Hotel Reservation Microservices Platform
+
+<div align="center">
+
+![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
+![NestJS](https://img.shields.io/badge/nestjs-%5E10.0.0-ea2845)
+![TypeScript](https://img.shields.io/badge/typescript-%5E5.0.0-blue)
+![MongoDB](https://img.shields.io/badge/mongodb-latest-green)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-GCP CI/CD Deployment with Kubernetes
-
-*Note: anything like _var_ it means you have to fill this with appropriate value:
-
-1- Enable Google Container Registry API & Artifact Registry:
-
-    a. Create Repository for each service:
-
-        i. Install gcloud cli
-
-        ii. Initialize gcloud
-
-        iii. Set project of gcloud to your project
-
-        iv. gcloud authentication
-
-    b. Build & push images (e.g. reservations):
-
-    cd /apps/reservations/
-    docker build -t reservations -f ./Dockerfile ../../
-    docker tag reservations _reservations_repo_url_/production
-    docker image push _reservations_repo_url_/production
-
-2- Automated CI/CD with Google CloudBuild:
-
-    a. Create cloudbuild.yaml file at your project’s root: each repository will have two steps:
-
-        i. Build step
-
-        ii. Push step
-
-    b. Set up a build trigger that pulls from your github repo and builds images using the latest changes on code.
-
-3- Setup Kubernetes (locally)
-
-    a. Enable Kubernetes from Docker Desktop
-
-    b. Install "helm" as dependency manager for Kubernetes cluster
-
-    c. mkdir k8s directory, and: cd k8s/
-
-    d. Create a new HELM chart (e.g. named wiser):
-
-    helm create wiser
-
-    e. Create Deployments (pods) for each one of the services:
-
-        i. Install kubectl if not exists.
-
-        ii. Create deployment:
-
-        kubectl create deployment reservations --image=_gcloud_image_url_ --dry-run=client -o yaml > ./wiser/templates/reservations/deployment.yaml
-
-        iii. Install helm chart named "wiser":
-
-        helm install wiser ./k8s/
-
-        iv. Double check created pod with command:
-
-        kubectl get pods
-
-4- Enable local Kubernetes cluster to access Artifact Registry images:
-
-    a. Get API keys:
-
-        i. Go to GCloud: "APIs & Services" -> credentials -> service account (Role: artifact registry reader)
-
-        ii. Service account -> Keys -> Json -> create
-
-    b. Tell Kubernetes to use the JSON key file when pulling from GCR:
-
-        i. Create Kubernetes secret:
-
-        kubectl create secret docker-registry gcr-json-key --docker-server=_first_part_of_service_url_ --docker-username=_json_key --docker-password="$(cat _path_to_json_key_file_)" --docker-email=blabla@blac.com
-
-        ii. Tell the "default" service-account, in GCP, to use this secret:
-
-        kubectl patch serviceaccount default -p '{"imagePullSecrets": [ { "name": "gcr-json-key" } ] }'
-
-        iii. Double Check:
-
-        kubectl get pods
-
-5- Create Kubernetes cluster services:
-
-    a. To create generic secrets for sensitive env vars to be used in services to use: (e.g. secret object "jwt" and variable "refreshToken" with value "blablabla")
-
-        i. Create secret:
-
-        kubectl create secret generic "jwt" --from-literal=refreshToken=blablabla
-
-        ii. Update chart with command:
-
-        helm upgrade wiser ./k8s/wiser
-
-        iii. To update a current secret (e.g., google) for a service (e.g., notifications):
-
-        kubectl edit secret google
-        kubectl rollout restart deployment notifications
-        kubectl get pods
-
-    b. Generate a service for a microservice (e.g. auth, ports exposed 3002/tcp, and 3001/http):
-
-        i. Create two services, one for tcp, and one for http:
-
-        kubectl create service clusterip "auth-tcp" --tcp=3002 --dry-run=client -o yaml > k8s/wiser/templates/auth/service-tcp.yaml
-        kubectl create service nodeport auth-http --tcp=3001 --dry-run=client -o yaml > k8s/wiser/templates/auth/service-http.yaml
-
-        ii. Update chart:
-
-        helm upgrade wiser k8s/wiser
-
-        iii. Double check with:
-
-        kubectl get svc
-
-6- To connect local machine to the online Google Kubernetes Engine’s cluster:
-
-    a. Get connect command from: GKE -> Clusters -> “Connect” Button , and then run it locally.
-
-    b. List all contexts (clusters) to copy the name of the GKE one:
-
-    kubectl config get-contexts
-
-    c. Switch to online GKE cluster:
-
-    kubectl config use-context _context_name_
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
-
-```bash
-$ pnpm install
+**Production-grade hotel reservation system built with NestJS microservices**
+
+[Features](#-features) • [Quick Start](#-quick-start) • [Architecture](#-architecture) • [Deployment](#-deployment)
+
+</div>
+
+---
+
+## 📋 Table of Contents
+
+- [Overview](#-overview)
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Architecture](#-architecture)
+- [Quick Start](#-quick-start)
+- [Project Structure](#-project-structure)
+- [Microservices](#-microservices)
+- [Development](#-development)
+- [Testing](#-testing)
+- [Deployment](#-deployment)
+- [Google Cloud Platform](#-google-cloud-platform-gcp-deployment)
+- [Kubernetes](#-kubernetes-deployment)
+- [Contributing](#-contributing)
+- [License](#-license)
+
+---
+
+## 🌟 Overview
+
+**Wiser** is a comprehensive hotel reservation platform demonstrating **enterprise-grade microservices architecture** using NestJS. The project showcases modern backend development practices including dependency injection, event-driven communication, database per service pattern, and cloud-native deployment.
+
+### Why Wiser?
+
+- ✅ **NestJS Best Practices**: Modules, services, controllers, guards, interceptors
+- ✅ **Cloud-Native**: Designed for Google Cloud Platform with Kubernetes
+- ✅ **Production-Ready**: Authentication, validation, error handling, logging
+- ✅ **Scalable Architecture**: Independent services, horizontal scaling
+- ✅ **CI/CD Pipeline**: Automated builds and deployments with CloudBuild
+- ✅ **Educational**: Clean code, comprehensive documentation, real-world patterns
+
+---
+
+## ✨ Features
+
+### Core Functionality
+- 🔐 **Authentication & Authorization**: JWT-based auth with passport.js
+- 🏨 **Reservation Management**: Create, update, cancel hotel bookings
+- 💳 **Payment Processing**: Payment integration with Stripe
+- 📧 **Notification System**: Email notifications for bookings, cancellations
+- 📊 **Admin Dashboard**: Manage reservations, users, hotels
+
+### Technical Features
+- 🎯 **Microservices Architecture**: Independent, deployable services
+- 🔄 **Event-Driven Communication**: RabbitMQ/NATS for async messaging
+- 💾 **Database Per Service**: MongoDB with Mongoose
+- 🐳 **Containerized**: Docker for local development
+- ☸️ **Kubernetes-Ready**: Helm charts for production deployment
+- 🚀 **GCP Integration**: Cloud Build, Artifact Registry, GKE
+
+---
+
+## 🛠 Tech Stack
+
+### Backend Framework
+- **NestJS** 10.x - Progressive Node.js framework
+- **TypeScript** 5.x - Type-safe development
+- **Node.js** 20.x - Runtime environment
+
+### Microservices
+| Service | Responsibility | Database |
+|---------|---------------|----------|
+| **Reservations** | Booking management | MongoDB |
+| **Auth** | Authentication & authorization | MongoDB |
+| **Payments** | Payment processing | MongoDB |
+| **Notifications** | Email/SMS alerts | MongoDB |
+
+### Infrastructure
+- **Database**: MongoDB with Mongoose ODM
+- **Message Broker**: RabbitMQ / NATS
+- **Containerization**: Docker & Docker Compose
+- **Orchestration**: Kubernetes with Helm
+- **Cloud Platform**: Google Cloud Platform (GCP)
+  - Google Artifact Registry
+  - Google Kubernetes Engine (GKE)
+  - Cloud Build for CI/CD
+
+### Testing
+- **Unit Tests**: Jest
+- **E2E Tests**: Supertest
+- **Integration Tests**: Testcontainers
+
+---
+
+## 🏗 Architecture
+
+### High-Level System Architecture
+
+```
+┌────────────────────────────────────────────────────────┐
+│                    Client Layer                         │
+│          (Web App, Mobile App, Admin Panel)            │
+└─────────────────────┬──────────────────────────────────┘
+                      │ HTTPS/REST
+                      ▼
+┌────────────────────────────────────────────────────────┐
+│                   API Gateway                          │
+│  ┌──────────┐  ┌──────────┐  ┌──────────────┐       │
+│  │  Auth    │─▶│   Rate   │─▶│   Routing    │       │
+│  │  Guard   │  │  Limit   │  │   Logic      │       │
+│  └──────────┘  └──────────┘  └──────────────┘       │
+└───────────────────┬────────────────────────────────────┘
+                    │
+        ┌───────────┼───────────┐
+        ▼           ▼           ▼
+   ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐
+   │  Auth   │ │Reserva- │ │Payments │ │ Notif   │
+   │ Service │ │  tions  │ │ Service │ │ Service │
+   │         │ │ Service │ │         │ │         │
+   └────┬────┘ └────┬────┘ └────┬────┘ └────┬────┘
+        │           │           │           │
+        └───────────┴───────────┴───────────┘
+                    │
+              ┌─────┴─────┐
+              ▼           ▼
+        ┌──────────┐ ┌──────────┐
+        │ RabbitMQ │ │ MongoDB  │
+        │ (Events) │ │(Per Svc) │
+        └──────────┘ └──────────┘
 ```
 
-## Running the app
+### Microservices Communication
+
+1. **Synchronous**: REST API for immediate responses
+2. **Asynchronous**: RabbitMQ/NATS for events (booking confirmation, payments)
+3. **Database Per Service**: Each service owns its data
+
+---
+
+## 🚀 Quick Start
+
+Get Wiser running locally in **5 minutes**:
+
+### Prerequisites
+
+- **Node.js** >= 20.x
+- **Docker** & **Docker Compose**
+- **Git**
+
+### Local Development
 
 ```bash
-# development
-$ pnpm run start
+# 1. Clone the repository
+git clone https://github.com/hassonor/wiser.git
+cd wiser
 
-# watch mode
-$ pnpm run start:dev
+# 2. Install dependencies
+npm install
 
-# production mode
-$ pnpm run start:prod
+# 3. Start MongoDB and RabbitMQ via Docker
+docker-compose up -d
+
+# 4. Set up environment variables
+cp .env.example .env
+# Edit .env with your configuration
+
+# 5. Run database migrations (if any)
+npm run migration:run
+
+# 6. Start all microservices in development mode
+npm run start:dev
+
+# Access the API at http://localhost:3000
 ```
 
-## Test
+### Verification
 
 ```bash
-# unit tests
-$ pnpm run test
+# Health check
+curl http://localhost:3000/health
 
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+# Test authentication
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password"}'
 ```
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If
-you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## 📁 Project Structure
 
-## Stay in touch
+```
+wiser/
+├── apps/                          # Microservices
+│   ├── reservations/              # Reservation service
+│   │   ├── src/
+│   │   │   ├── dto/               # Data transfer objects
+│   │   │   ├── entities/          # Database entities
+│   │   │   ├── reservations.controller.ts
+│   │   │   ├── reservations.service.ts
+│   │   │   ├── reservations.module.ts
+│   │   │   └── main.ts
+│   │   ├── test/
+│   │   └── Dockerfile
+│   │
+│   ├── auth/                      # Authentication service
+│   │   ├── src/
+│   │   │   ├── strategies/        # Passport strategies (JWT, local)
+│   │   │   ├── guards/            # Auth guards
+│   │   │   ├── auth.controller.ts
+│   │   │   ├── auth.service.ts
+│   │   │   └── main.ts
+│   │   └── Dockerfile
+│   │
+│   ├── payments/                  # Payment service
+│   └── notifications/             # Notification service
+│
+├── libs/                          # Shared libraries
+│   ├── common/                    # Common utilities
+│   │   ├── database/              # Database connection
+│   │   ├── decorators/            # Custom decorators
+│   │   ├── filters/               # Exception filters
+│   │   ├── interceptors/          # Logging, transform
+│   │   └── guards/                # Shared guards
+│   └── config/                    # Configuration module
+│
+├── k8s/                           # Kubernetes manifests
+│   └── wiser/                     # Helm chart
+│       ├── Chart.yaml
+│       ├── values.yaml
+│       └── templates/
+│           ├── reservations/
+│           │   ├── deployment.yaml
+│           │   └── service.yaml
+│           ├── auth/
+│           └── payments/
+│
+├── .cursorrules                   # AI coding standards
+├── .github/
+│   ├── dependabot.yml            # Automated dependency updates
+│   └── workflows/                 # CI/CD pipelines
+│
+├── cloudbuild.yaml               # Google Cloud Build config
+├── docker-compose.yaml           # Local development
+├── nest-cli.json                 # NestJS configuration
+├── package.json                  # Dependencies
+└── README.md
+```
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+---
 
-## License
+## 🔧 Microservices
 
-Nest is [MIT licensed](LICENSE).
+### Reservations Service
+**Manages hotel bookings**
+
+**Endpoints**:
+```
+POST   /reservations              # Create booking
+GET    /reservations              # List all bookings
+GET    /reservations/:id          # Get booking details
+PATCH  /reservations/:id          # Update booking
+DELETE /reservations/:id          # Cancel booking
+```
+
+**Events Published**:
+- `reservation.created`
+- `reservation.updated`
+- `reservation.cancelled`
+
+### Auth Service
+**JWT-based authentication**
+
+**Endpoints**:
+```
+POST   /auth/register            # User registration
+POST   /auth/login               # User login
+POST   /auth/refresh             # Refresh access token
+GET    /auth/profile             # Get user profile
+```
+
+**Guards**:
+- `JwtAuthGuard` - Protect routes with JWT
+- `LocalAuthGuard` - Email/password authentication
+
+### Payments Service
+**Stripe integration**
+
+**Endpoints**:
+```
+POST   /payments/charge          # Process payment
+POST   /payments/refund          # Refund payment
+GET    /payments/:id             # Get payment details
+```
+
+### Notifications Service
+**Email/SMS notifications**
+
+**Events Consumed**:
+- `reservation.created` → Send confirmation email
+- `reservation.cancelled` → Send cancellation email
+- `payment.completed` → Send receipt
+
+---
+
+## 💻 Development
+
+### Running Individual Services
+
+```bash
+# Start specific service
+npm run start:dev reservations
+
+# Build for production
+npm run build reservations
+
+# Run tests
+npm run test reservations
+npm run test:e2e reservations
+```
+
+### Environment Variables
+
+Each service requires environment variables:
+
+```env
+# Reservations Service
+MONGODB_URI=mongodb://localhost:27017/reservations
+RABBITMQ_URL=amqp://localhost:5672
+JWT_SECRET=your-secret-key
+PORT=3001
+
+# Auth Service
+MONGODB_URI=mongodb://localhost:27017/auth
+JWT_SECRET=your-secret-key
+JWT_EXPIRES_IN=1h
+PORT=3002
+
+# Payments Service
+STRIPE_SECRET_KEY=sk_test_...
+MONGODB_URI=mongodb://localhost:27017/payments
+PORT=3003
+```
+
+### Code Generation
+
+```bash
+# Generate new module
+nest g module users apps/reservations
+
+# Generate service
+nest g service users apps/reservations
+
+# Generate controller
+nest g controller users apps/reservations
+```
+
+---
+
+## 🧪 Testing
+
+### Unit Tests
+
+```bash
+# Run all tests
+npm run test
+
+# Watch mode
+npm run test:watch
+
+# Coverage
+npm run test:cov
+```
+
+### E2E Tests
+
+```bash
+# Run E2E tests for a service
+npm run test:e2e reservations
+```
+
+### Integration Tests
+
+```bash
+# Uses Testcontainers for real MongoDB
+npm run test:integration
+```
+
+---
+
+## 🚢 Deployment
+
+### Docker Compose (Local/Staging)
+
+```bash
+# Build and start all services
+docker-compose up --build
+
+# Scale a service
+docker-compose up --scale reservations=3
+
+# View logs
+docker-compose logs -f reservations
+
+# Stop all
+docker-compose down
+```
+
+---
+
+## ☁️ Google Cloud Platform (GCP) Deployment
+
+### 1. Enable Required APIs
+
+```bash
+# Enable Container Registry and Artifact Registry
+gcloud services enable containerregistry.googleapis.com
+gcloud services enable artifactregistry.googleapis.com
+```
+
+### 2. Create Artifact Registry Repository
+
+```bash
+# Set your project
+gcloud config set project YOUR_PROJECT_ID
+
+# Create repository for each service
+gcloud artifacts repositories create reservations \
+  --repository-format=docker \
+  --location=us-central1 \
+  --description="Reservations service images"
+
+# Repeat for auth, payments, notifications
+```
+
+### 3. Build & Push Docker Images
+
+```bash
+# Authenticate Docker
+gcloud auth configure-docker us-central1-docker.pkg.dev
+
+# Build and push (example for reservations)
+cd apps/reservations/
+docker build -t reservations -f ./Dockerfile ../../
+docker tag reservations us-central1-docker.pkg.dev/YOUR_PROJECT/reservations/production
+docker push us-central1-docker.pkg.dev/YOUR_PROJECT/reservations/production
+```
+
+### 4. Automated CI/CD with Cloud Build
+
+Create `cloudbuild.yaml` at project root:
+
+```yaml
+steps:
+  # Build reservations service
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/reservations/production'
+      - '-f'
+      - './apps/reservations/Dockerfile'
+      - '.'
+
+  # Push reservations service
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/reservations/production'
+
+  # Repeat for other services...
+
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/reservations/production'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/auth/production'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/payments/production'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/notifications/production'
+```
+
+**Set up Cloud Build Trigger**:
+1. Go to Cloud Build → Triggers
+2. Connect your GitHub repository
+3. Create trigger to run on push to `main` branch
+4. Use `cloudbuild.yaml` as build configuration
+
+---
+
+## ☸️ Kubernetes Deployment
+
+### Local Kubernetes Setup
+
+```bash
+# Enable Kubernetes in Docker Desktop
+# Settings → Kubernetes → Enable Kubernetes
+
+# Install Helm
+brew install helm  # macOS
+choco install helm # Windows
+
+# Verify installation
+kubectl version
+helm version
+```
+
+### Create Helm Chart
+
+```bash
+# Create Helm chart
+cd k8s/
+helm create wiser
+
+# Create deployments for each service
+kubectl create deployment reservations \
+  --image=us-central1-docker.pkg.dev/PROJECT/reservations/production \
+  --dry-run=client -o yaml > ./wiser/templates/reservations/deployment.yaml
+
+# Create services
+kubectl create service clusterip reservations \
+  --tcp=3001:3001 \
+  --dry-run=client -o yaml > ./wiser/templates/reservations/service.yaml
+
+# Repeat for other services
+```
+
+### Deploy to Kubernetes
+
+```bash
+# Install/upgrade the Helm chart
+helm upgrade --install wiser ./k8s/wiser \
+  --set reservations.image=us-central1-docker.pkg.dev/PROJECT/reservations/production \
+  --set auth.image=us-central1-docker.pkg.dev/PROJECT/auth/production
+
+# Check deployment status
+kubectl get pods
+kubectl get services
+
+# View logs
+kubectl logs -f deployment/reservations
+
+# Scale deployment
+kubectl scale deployment reservations --replicas=3
+```
+
+### Google Kubernetes Engine (GKE)
+
+```bash
+# Create GKE cluster
+gcloud container clusters create wiser-cluster \
+  --zone=us-central1-a \
+  --num-nodes=3 \
+  --machine-type=n1-standard-2
+
+# Get credentials
+gcloud container clusters get-credentials wiser-cluster --zone=us-central1-a
+
+# Deploy using Helm
+helm upgrade --install wiser ./k8s/wiser
+
+# Set up Ingress for external access
+kubectl apply -f k8s/ingress.yaml
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### Development Workflow
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make your changes following `.cursorrules`
+4. Write/update tests
+5. Run linter: `npm run lint`
+6. Commit: `git commit -m "feat: add amazing feature"`
+7. Push: `git push origin feature/amazing-feature`
+8. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- Built with [NestJS](https://nestjs.com/) - A progressive Node.js framework
+- Inspired by production hotel booking platforms
+- Created for educational purposes to demonstrate microservices architecture
+
+---
+
+<div align="center">
+
+**Made with ❤️ by [Or Hasson](https://github.com/hassonor)**
+
+⭐ Star this repo if you find it helpful!
+
+</div>
